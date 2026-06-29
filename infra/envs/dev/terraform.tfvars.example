@@ -1,0 +1,65 @@
+project_name = "restaurant-platform"
+owner        = "platform-team"
+
+aws_region         = "ap-south-1"
+availability_zones = ["ap-south-1a", "ap-south-1b"]
+
+vpc_cidr             = "10.20.0.0/16"
+public_subnet_cidrs  = ["10.20.0.0/24", "10.20.1.0/24"]
+private_subnet_cidrs = ["10.20.10.0/24", "10.20.11.0/24"]
+
+# Set false for lower dev cost; tasks in private subnets will then need VPC endpoints to pull from ECR.
+enable_nat_gateway = true
+
+domain_name                   = "app.example.com"
+route53_zone_id               = ""
+route53_zone_name             = "example.com"
+create_route53_records        = true
+create_acm_validation_records = true
+
+backend_routing_mode = "path"
+api_domain_name      = ""
+
+frontend_container_port = 3000
+backend_container_port  = 8000
+
+frontend_health_check_path = "/"
+backend_health_check_path  = "/health"
+
+frontend_cpu    = 256
+frontend_memory = 512
+backend_cpu     = 256
+backend_memory  = 512
+
+frontend_desired_count = 1
+backend_desired_count  = 1
+
+log_retention_days = 30
+
+frontend_image_tag = "bootstrap"
+backend_image_tag  = "bootstrap"
+
+frontend_environment = {
+  NEXT_PUBLIC_API_BASE_URL = "/api"
+}
+
+backend_environment = {
+  APP_ENV = "dev"
+}
+
+frontend_secrets = {}
+
+backend_secrets = {
+  # DATABASE_URL = "arn:aws:ssm:ap-south-1:123456789012:parameter/restaurant/dev/backend/database_url"
+}
+
+github_org = "your-github-org-or-user"
+github_repo = "mini-app"
+github_allowed_branches = ["develop", "main"]
+github_allowed_environments = ["dev", "prod"]
+
+create_github_oidc_provider      = false
+existing_github_oidc_provider_arn = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
+
+create_basic_alarms = true
+alarm_sns_topic_arn = ""

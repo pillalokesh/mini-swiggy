@@ -1,0 +1,15 @@
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/*.tfstate
+**/*.tfstate.*
+**/terraform.tfvars
+**/backend.hcl
+
+# IDE and OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local artifacts
+*.log

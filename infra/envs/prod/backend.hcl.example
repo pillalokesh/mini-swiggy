@@ -1,0 +1,5 @@
+bucket         = "restaurant-platform-terraform-state"
+key            = "infra/prod/terraform.tfstate"
+region         = "ap-south-1"
+dynamodb_table = "restaurant-platform-terraform-locks"
+encrypt        = true

@@ -1,0 +1,42 @@
+name: Terraform Validate
+
+on:
+  pull_request:
+    paths:
+      - infra/**
+      - .github/workflows/terraform-validate.yml
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Terraform fmt check
+        run: terraform -chdir=infra fmt -check -recursive
+
+      - name: Terraform init root (no backend)
+        run: terraform -chdir=infra init -backend=false
+
+      - name: Terraform validate root
+        run: terraform -chdir=infra validate
+
+      - name: Terraform init dev (no backend)
+        run: terraform -chdir=infra/envs/dev init -backend=false
+
+      - name: Terraform validate dev
+        run: terraform -chdir=infra/envs/dev validate
+
+      - name: Terraform init prod (no backend)
+        run: terraform -chdir=infra/envs/prod init -backend=false
+
+      - name: Terraform validate prod
+        run: terraform -chdir=infra/envs/prod validate

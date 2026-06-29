@@ -1,0 +1,80 @@
+name: Deploy Backend Dev
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - backend/**
+      - deploy/task-definitions/backend*.json
+      - .github/workflows/deploy-backend-dev.yml
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER_DEV }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE_BACKEND_DEV }}
+  ECS_TASK_FAMILY: ${{ vars.ECS_TASK_FAMILY_BACKEND_DEV }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY_BACKEND_DEV }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials from GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_OIDC_ROLE_DEV }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        id: build-image
+        run: |
+          IMAGE_TAG=${GITHUB_SHA}
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:${IMAGE_TAG}
+          docker build -f backend/Dockerfile -t ${IMAGE_URI} backend
+          docker push ${IMAGE_URI}
+          echo "image=${IMAGE_URI}" >> "$GITHUB_OUTPUT"
+
+      - name: Download active task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "${ECS_TASK_FAMILY}" \
+            --query taskDefinition > task-definition-raw.json
+          cat task-definition-raw.json | jq 'del(
+            .taskDefinitionArn,
+            .revision,
+            .status,
+            .requiresAttributes,
+            .compatibilities,
+            .registeredAt,
+            .registeredBy
+          )' > task-definition.json
+
+      - name: Render new task definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: backend
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

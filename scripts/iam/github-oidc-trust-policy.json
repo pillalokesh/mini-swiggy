@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::385168913795:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": [
+            "repo:pillalokesh/mini-swiggy:ref:refs/heads/main",
+            "repo:pillalokesh/mini-swiggy:ref:refs/heads/develop",
+            "repo:pillalokesh/mini-swiggy:environment:dev",
+            "repo:pillalokesh/mini-swiggy:environment:prod"
+          ]
+        }
+      }
+    }
+  ]
+}

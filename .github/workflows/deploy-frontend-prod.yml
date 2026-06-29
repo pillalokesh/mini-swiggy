@@ -14,11 +14,11 @@ permissions:
   contents: read
 
 env:
-  AWS_REGION: ${{ vars.AWS_REGION }}
-  ECS_CLUSTER: ${{ vars.ECS_CLUSTER_PROD }}
-  ECS_SERVICE: ${{ vars.ECS_SERVICE_FRONTEND_PROD }}
-  ECS_TASK_FAMILY: ${{ vars.ECS_TASK_FAMILY_FRONTEND_PROD }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY_FRONTEND_PROD }}
+  AWS_REGION: ${{ vars.AWS_REGION || secrets.AWS_REGION }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER_PROD || secrets.ECS_CLUSTER_PROD }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE_FRONTEND_PROD || secrets.ECS_SERVICE_FRONTEND_PROD }}
+  ECS_TASK_FAMILY: ${{ vars.ECS_TASK_FAMILY_FRONTEND_PROD || secrets.ECS_TASK_FAMILY_FRONTEND_PROD }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY_FRONTEND_PROD || secrets.ECR_REPOSITORY_FRONTEND_PROD }}
 
 jobs:
   deploy:
@@ -32,7 +32,7 @@ jobs:
       - name: Configure AWS credentials from GitHub OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ vars.AWS_GITHUB_OIDC_ROLE_PROD }}
+          role-to-assume: ${{ vars.AWS_GITHUB_OIDC_ROLE_PROD || secrets.AWS_GITHUB_OIDC_ROLE_PROD }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR

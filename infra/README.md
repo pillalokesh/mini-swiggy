@@ -309,3 +309,28 @@ Deployment failure checks:
 - ElastiCache Redis for session/cache
 - VPC endpoints for private egress reduction and no-NAT patterns
 - Centralized dashboard and alarm notifications via SNS/PagerDuty
+
+## Connect Domain to Route53 (lokeshwaffle.in)
+
+After `terraform apply`, follow this quick DNS handoff:
+
+1. Open Route53 Hosted Zones in AWS Console.
+2. Open the hosted zone for `lokeshwaffle.in`.
+3. Copy the 4 `NS` record values exactly.
+4. Open your domain registrar panel for `lokeshwaffle.in`.
+5. Replace existing nameservers with the 4 Route53 nameservers.
+
+Important:
+- Old nameservers at the registrar must be fully replaced, not mixed.
+
+Then verify:
+
+1. Wait for DNS propagation (usually minutes to a few hours).
+2. Check domain resolution to ALB:
+  - `nslookup lokeshwaffle.in`
+  - `nslookup app.lokeshwaffle.in`
+3. Confirm ACM certificate status is `Issued`.
+4. Open your domain over HTTPS and verify valid TLS.
+
+Common mistake:
+- Route53 hosted zone exists, but registrar nameservers were not updated. In that case the domain will not route to AWS.

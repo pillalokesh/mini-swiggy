@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-cream text-choco antialiased;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+a {
+  @apply transition-colors;
+}
+
+.dessert-card {
+  @apply rounded-2xl border border-white/40 bg-white/75 backdrop-blur shadow-dessert;
+}

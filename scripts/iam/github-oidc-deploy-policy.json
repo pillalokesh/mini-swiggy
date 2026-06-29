@@ -1,0 +1,75 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "EcrAuth",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "EcrPushPull",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:PutImage",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:DescribeRepositories",
+        "ecr:DescribeImages"
+      ],
+      "Resource": [
+        "arn:aws:ecr:ap-south-1:385168913795:repository/restaurant-platform-dev-frontend",
+        "arn:aws:ecr:ap-south-1:385168913795:repository/restaurant-platform-dev-backend",
+        "arn:aws:ecr:ap-south-1:385168913795:repository/restaurant-platform-prod-frontend",
+        "arn:aws:ecr:ap-south-1:385168913795:repository/restaurant-platform-prod-backend"
+      ]
+    },
+    {
+      "Sid": "EcsDeploy",
+      "Effect": "Allow",
+      "Action": [
+        "ecs:RegisterTaskDefinition",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeServices",
+        "ecs:UpdateService",
+        "ecs:TagResource",
+        "ecs:DescribeTasks",
+        "ecs:ListTasks"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "PassRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::385168913795:role/restaurant-platform-dev-frontend-*",
+        "arn:aws:iam::385168913795:role/restaurant-platform-dev-backend-*",
+        "arn:aws:iam::385168913795:role/restaurant-platform-prod-frontend-*",
+        "arn:aws:iam::385168913795:role/restaurant-platform-prod-backend-*"
+      ]
+    },
+    {
+      "Sid": "ReadOnlyOps",
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:Describe*",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "cloudwatch:DescribeAlarms",
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

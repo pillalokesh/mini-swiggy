@@ -14,11 +14,11 @@ permissions:
   contents: read
 
 env:
-  AWS_REGION: ${{ vars.AWS_REGION || secrets.AWS_REGION }}
-  ECS_CLUSTER: ${{ vars.ECS_CLUSTER_DEV || secrets.ECS_CLUSTER_DEV }}
-  ECS_SERVICE: ${{ vars.ECS_SERVICE_FRONTEND_DEV || secrets.ECS_SERVICE_FRONTEND_DEV }}
-  ECS_TASK_FAMILY: ${{ vars.ECS_TASK_FAMILY_FRONTEND_DEV || secrets.ECS_TASK_FAMILY_FRONTEND_DEV }}
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY_FRONTEND_DEV || secrets.ECR_REPOSITORY_FRONTEND_DEV }}
+  AWS_REGION: ap-south-1
+  ECS_CLUSTER: restaurant-platform-dev-ecs-cluster
+  ECS_SERVICE: restaurant-platform-dev-frontend
+  ECS_TASK_FAMILY: restaurant-platform-dev-frontend-task
+  ECR_REPOSITORY: restaurant-platform-dev-frontend
 
 jobs:
   deploy:
@@ -32,7 +32,7 @@ jobs:
       - name: Configure AWS credentials from GitHub OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ vars.AWS_GITHUB_OIDC_ROLE_DEV || secrets.AWS_GITHUB_OIDC_ROLE_DEV }}
+          role-to-assume: arn:aws:iam::385168913795:role/restaurant-platform-dev-github-actions-deploy-role
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR

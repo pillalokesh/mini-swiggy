@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -8,6 +9,14 @@ export default function OrderSuccessPage() {
   const order = params.get("order") || "WW-PENDING";
   const whatsapp = params.get("whatsapp") || `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "9492520198"}`;
   const amount = params.get("amount") || "0";
+  const whatsappUrl = whatsapp;
+
+  useEffect(() => {
+    if (!whatsappUrl.startsWith("https://wa.me/")) {
+      return;
+    }
+    window.location.assign(whatsappUrl);
+  }, [whatsappUrl]);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 text-center">
@@ -21,7 +30,7 @@ export default function OrderSuccessPage() {
           <p className="mt-2 text-sm text-cocoa/80">WhatsApp message is ready. Tap below to notify store instantly.</p>
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <a href={decodeURIComponent(whatsapp)} className="rounded-full bg-[#25D366] px-5 py-3 font-bold text-white">Send on WhatsApp</a>
+          <a href={whatsappUrl} className="rounded-full bg-[#25D366] px-5 py-3 font-bold text-white">Send on WhatsApp</a>
           <Link href="/menu" className="rounded-full bg-caramel px-5 py-3 font-bold text-cream">Continue Browsing</Link>
         </div>
       </div>

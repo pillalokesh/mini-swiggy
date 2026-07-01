@@ -8,7 +8,11 @@
 
 body {
   @apply bg-cream text-choco antialiased;
-  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  font-family: "Poppins", "Trebuchet MS", "Segoe UI", sans-serif;
+  background-image:
+    radial-gradient(circle at 8% 8%, rgba(184, 106, 45, 0.22), transparent 35%),
+    radial-gradient(circle at 92% 16%, rgba(229, 177, 75, 0.2), transparent 38%),
+    linear-gradient(180deg, #fff8ef 0%, #f8eedd 36%, #f4e3cd 100%);
 }
 
 a {
@@ -16,5 +20,27 @@ a {
 }
 
 .dessert-card {
-  @apply rounded-2xl border border-white/40 bg-white/75 backdrop-blur shadow-dessert;
+  @apply rounded-3xl border border-white/50 bg-white/80 backdrop-blur shadow-dessert;
+}
+
+.gloss-panel {
+  @apply border border-white/40 bg-white/10 backdrop-blur-lg;
+}
+
+.choco-section {
+  background: linear-gradient(150deg, #1f0f08 0%, #2b1208 38%, #4a2312 70%, #6f3418 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #f8eedd 0%, #f8d9a3 45%, #e5b14b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.soft-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
 }

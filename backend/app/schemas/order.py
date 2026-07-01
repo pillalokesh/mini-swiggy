@@ -12,7 +12,7 @@ class OrderCreateItem(BaseModel):
 
 class OrderCreate(BaseModel):
     customer_name: str
-    customer_phone: str
+    customer_phone: str = Field(pattern=r"^(?:\+91)?[6-9]\d{9}$")
     order_type: Literal["dine-in", "takeaway", "delivery"]
     table_number: Optional[str] = None
     delivery_address: Optional[str] = None

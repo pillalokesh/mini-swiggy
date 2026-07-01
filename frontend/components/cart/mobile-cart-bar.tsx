@@ -13,10 +13,10 @@ export function MobileCartBar() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/20 bg-choco px-4 py-3 md:hidden">
-      <Link href="/cart" className="flex items-center justify-between rounded-full bg-caramel px-4 py-3 text-sm font-bold text-cream">
-        <span>{items.length} items</span>
-        <span>View Cart {formatINR(subtotal)}</span>
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/20 bg-choco/95 px-4 py-3 backdrop-blur md:hidden">
+      <Link href="/cart" className="flex items-center justify-between rounded-full bg-gradient-to-r from-caramel to-cocoa px-4 py-3 text-sm font-bold text-cream shadow-lg">
+        <span>{items.length} items in cart</span>
+        <span>{formatINR(subtotal)}</span>
       </Link>
     </div>
   );

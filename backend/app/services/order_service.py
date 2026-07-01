@@ -14,7 +14,21 @@ def _next_order_number(session: Session) -> str:
     return f"WW-{len(total) + 1:06d}"
 
 
-def create_order(session: Session, payload: OrderCreate, restaurant_id: int):
+def _normalize_customer_phone(phone: str) -> str:
+    digits = "".join(ch for ch in phone if ch.isdigit())
+    if len(digits) == 12 and digits.startswith("91"):
+        return digits[2:]
+    if len(digits) == 10:
+        return digits
+    return digits
+
+
+def create_order(
+    session: Session,
+    payload: OrderCreate,
+    restaurant_id: int,
+    restaurant_whatsapp_number: str | None = None,
+):
     subtotal = 0.0
     order_items_to_create: list[OrderItem] = []
     options_to_create: list[tuple[int, list[OrderItemOption]]] = []
@@ -56,7 +70,7 @@ def create_order(session: Session, payload: OrderCreate, restaurant_id: int):
         order_number=_next_order_number(session),
         restaurant_id=restaurant_id,
         customer_name=payload.customer_name,
-        customer_phone=payload.customer_phone,
+        customer_phone=_normalize_customer_phone(payload.customer_phone),
         order_type=payload.order_type,
         table_number=payload.table_number,
         delivery_address=payload.delivery_address,
@@ -97,7 +111,7 @@ def create_order(session: Session, payload: OrderCreate, restaurant_id: int):
         options_map[item.id or 0] = options
 
     message = build_order_message(order, created_items, options_map)
-    whatsapp_url = build_whatsapp_url(message)
+    whatsapp_url = build_whatsapp_url(message, restaurant_whatsapp_number)
 
     order.whatsapp_status = "ready"
     order.updated_at = datetime.utcnow()

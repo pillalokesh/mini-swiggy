@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
+from app.core.config import settings
 from app.db.session import get_session
 from app.models.order import Order
 from app.models.restaurant import Restaurant
@@ -16,7 +17,12 @@ def place_order(payload: OrderCreate, session: Session = Depends(get_session)):
     if not restaurant:
         raise HTTPException(status_code=500, detail="Restaurant not configured")
 
-    order, whatsapp_url = create_order(session, payload, restaurant.id or 0)
+    order, whatsapp_url = create_order(
+        session,
+        payload,
+        restaurant.id or 0,
+        settings.backend_whatsapp_number,
+    )
     return OrderResponse(order_number=order.order_number, whatsapp_url=whatsapp_url, total_amount=order.total_amount)
 
 

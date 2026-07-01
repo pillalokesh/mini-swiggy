@@ -7,6 +7,11 @@ import { formatINR } from "@/lib/format";
 import { useCartStore } from "@/lib/cart-store";
 import type { OrderType } from "@/types";
 
+type Coordinates = {
+  latitude: number;
+  longitude: number;
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
@@ -23,14 +28,16 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [landmark, setLandmark] = useState("");
   const [notes, setNotes] = useState("");
+  const phoneDigits = customerPhone.replace(/\D/g, "");
 
   const canPlace = useMemo(() => {
     if (items.length === 0) return false;
     if (!customerName || !customerPhone) return false;
+    if (phoneDigits.length !== 10) return false;
     if (orderType === "dine-in") return tableNumber.length > 0;
     if (orderType === "delivery") return address.length > 0;
     return true;
-  }, [items.length, customerName, customerPhone, orderType, tableNumber, address]);
+  }, [items.length, customerName, customerPhone, phoneDigits.length, orderType, tableNumber, address]);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -39,13 +46,31 @@ export default function CheckoutPage() {
     setError("");
 
     try {
+      let coordinates: Coordinates | undefined;
+      if (orderType === "delivery" && typeof window !== "undefined" && "geolocation" in navigator) {
+        coordinates = await new Promise<Coordinates | undefined>((resolve) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolve({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              });
+            },
+            () => resolve(undefined),
+            { timeout: 5000 }
+          );
+        });
+      }
+
       const response = await api.createOrder({
         customer_name: customerName,
-        customer_phone: customerPhone,
+        customer_phone: phoneDigits,
         order_type: orderType,
         table_number: orderType === "dine-in" ? tableNumber : undefined,
         delivery_address: orderType === "delivery" ? address : undefined,
         delivery_landmark: orderType === "delivery" ? landmark : undefined,
+        latitude: coordinates?.latitude,
+        longitude: coordinates?.longitude,
         notes,
         items: items.map((entry) => ({
           menu_item_id: entry.item.id,
@@ -81,7 +106,18 @@ export default function CheckoutPage() {
 
           <div className="dessert-card space-y-3 p-4">
             <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Customer Name" className="w-full rounded-lg border border-cocoa/20 px-3 py-2" />
-            <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="Mobile Number" className="w-full rounded-lg border border-cocoa/20 px-3 py-2" />
+            <input
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.target.value)}
+              placeholder="Mobile Number"
+              type="tel"
+              inputMode="numeric"
+              maxLength={10}
+              className="w-full rounded-lg border border-cocoa/20 px-3 py-2"
+            />
+            {customerPhone.length > 0 && phoneDigits.length !== 10 && (
+              <p className="text-xs text-red-600">Enter a valid 10-digit mobile number.</p>
+            )}
             {orderType === "dine-in" && <input value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} placeholder="Table Number" className="w-full rounded-lg border border-cocoa/20 px-3 py-2" />}
             {orderType === "delivery" && (
               <>
